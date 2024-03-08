@@ -1,4 +1,3 @@
-#include <Arduino.h>
 #include <WiFiUdp.h>
 #include <ArduinoOTA.h>
 #include <Ticker.h>
