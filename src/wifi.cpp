@@ -10,6 +10,7 @@ void TaskWifi(void *pvParameters){
     // Loop here
     while(true){
         ArduinoOTA.handle();
+        delay(100);
     }
 }
 
