@@ -10,7 +10,8 @@ void TaskWifi(void *pvParameters){
     // Loop here
     while(true){
         ArduinoOTA.handle();
-        delay(100);
+        log_i("Stack size : %d", uxTaskGetStackHighWaterMark(NULL));
+        delay(1000);
     }
 }
 

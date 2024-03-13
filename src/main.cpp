@@ -17,4 +17,6 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
+  log_i("Stack size : %d", uxTaskGetStackHighWaterMark(NULL));
+  delay(1000);
 }
