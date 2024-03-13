@@ -6,8 +6,10 @@
 
 struct motor_configs {
                              // Referensi ke motor driver brushlessnya
-    int pin_direction   = 0; // VR
-    int pin_encoder     = 0; // Signal
+    int pin_enc_a       = 0; // Encoder Phase A
+    int pin_enc_b       = 0; // Encoder Phase B
+    int pin_h_mos       = 0; // High side mosfet
+    int pin_l_mos       = 0; // Low side mosfet
     int pin_enable      = 0; // EL atau Enable
     int pin_pwm         = 0; // Z/F
     int pwm_freq        = 0;
@@ -43,6 +45,7 @@ public:
     int64_t get_encoder_clear();
     int64_t get_encoder();
     bool set_pwm(int pwm_val);
+    void brake(int pwm = 255);
     int absolute(int value);
     void auto_speed();
 

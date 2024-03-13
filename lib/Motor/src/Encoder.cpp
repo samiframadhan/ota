@@ -17,8 +17,8 @@ Encoder *Encoder::encoders[MAX_ESP32_ENCODERS] = {NULL, };
 bool Encoder::attached_interrupt = false;
 
 Encoder::Encoder(enc_isr_cb_t enc_isr_cb, void* enc_isr_cb_data):
-    pin_encoder{(gpio_num_t) 0},
-    pin_direction{(gpio_num_t) 0},
+    pin_enc_b{(gpio_num_t) 0},
+    pin_enc_a{(gpio_num_t) 0},
     unit{(pcnt_unit_t) -1},
     count{0},
     enc_config{},
@@ -86,24 +86,24 @@ void Encoder::attach(int pin_encoder_, int pin_direction_, enum enc_type et){
 
     // Set data now that pin attach checks are done
     unit = (pcnt_unit_t) index;
-    this->pin_encoder = (gpio_num_t) pin_encoder_;
-    this->pin_direction = (gpio_num_t) pin_direction_;
+    this->pin_enc_b = (gpio_num_t) pin_encoder_;
+    this->pin_enc_a = (gpio_num_t) pin_direction_;
 
     // Set up the IO state of the pin
-    gpio_pad_select_gpio(pin_encoder);
-    gpio_pad_select_gpio(pin_direction);
-    gpio_set_direction(pin_encoder, GPIO_MODE_INPUT);
-    gpio_set_direction(pin_direction, GPIO_MODE_OUTPUT);
+    gpio_pad_select_gpio(pin_enc_b);
+    gpio_pad_select_gpio(pin_enc_a);
+    gpio_set_direction(pin_enc_b, GPIO_MODE_INPUT);
+    gpio_set_direction(pin_enc_a, GPIO_MODE_OUTPUT);
     if(use_internal_weak_pull_resistors == DOWN){
-        gpio_pulldown_en(pin_encoder);
+        gpio_pulldown_en(pin_enc_b);
     }
     if(use_internal_weak_pull_resistors == UP){
-        gpio_pullup_en(pin_encoder);
+        gpio_pullup_en(pin_enc_b);
     }
 
     //Setup encoder PCNT Config
-    enc_config.pulse_gpio_num = pin_encoder; //Tachometer
-    enc_config.ctrl_gpio_num = pin_direction; //Direction gpio
+    enc_config.pulse_gpio_num = pin_enc_b; //Tachometer
+    enc_config.ctrl_gpio_num = pin_enc_a; //Direction gpio
 
     enc_config.unit = unit;
     enc_config.channel = PCNT_CHANNEL_0;

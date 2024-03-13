@@ -47,8 +47,8 @@ public:
     bool is_attached(){return attached_interrupt;}
     void detach();
     // bool always_interrupt; //not used
-    gpio_num_t pin_encoder;
-    gpio_num_t pin_direction;
+    gpio_num_t pin_enc_b;
+    gpio_num_t pin_enc_a;
     pcnt_unit_t unit;
     pcnt_config_t enc_config;
     static uint32_t isrServiceCpuCore;

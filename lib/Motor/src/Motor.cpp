@@ -17,10 +17,10 @@ Motor::~Motor(){
 
 void Motor::config(motor_configs conf){
     configs = conf;
-    motor_encoder.attach_single_edge(configs.pin_encoder, configs.pin_direction);
-    pinMode(configs.pin_direction, OUTPUT);
+    motor_encoder.attach_single_edge(configs.pin_enc_b, configs.pin_enc_a);
+    pinMode(configs.pin_enc_a, OUTPUT);
     pinMode(configs.pin_enable, OUTPUT);
-    // ESP_LOGI(TAG, "Pin Direction: %d, Pin Enable: %d", configs.pin_direction, configs.pin_enable);
+    // ESP_LOGI(TAG, "Pin Direction: %d, Pin Enable: %d", configs.pin_enc_a, configs.pin_enable);
     set_pinpwm(configs.pin_pwm);
     if(configs.pin_pwm != 0){
         ledcAttachPin(configs.pin_pwm, this->pwm_channel);
@@ -38,7 +38,7 @@ void Motor::set_pinpwm(int pinpwm){
 }
 
 bool Motor::set_pwm(int pwm){
-    if((configs.pin_enable == 0) || (configs.pin_direction == 0) || (configs.pin_encoder == 0)){
+    if((configs.pin_enable == 0) || (configs.pin_enc_a == 0) || (configs.pin_enc_b == 0)){
         ESP_LOGE(TAG, "Pins not yet configured correctly!");
         return 0;
     }
@@ -48,37 +48,26 @@ bool Motor::set_pwm(int pwm){
     }
 
     if(pwm > 0){
+        digitalWrite(configs.pin_h_mos, 1);
+        digitalWrite(configs.pin_l_mos, 0);
         ledcWrite(this->pwm_channel, pwm);
-        // ESP_LOGI(TAG, "PWM Channel invoked: %d, Pin Enable: %d is %d", this->pwm_channel, configs.pin_enable, 1);
-        ESP_LOGI(TAG, "PWM Val: %d", pwm);
-        if(configs.reversed){
-            digitalWrite(configs.pin_direction, HIGH);
-            ESP_LOGI(TAG, "Direction: should be 1 currently %d", digitalRead(configs.pin_direction));
-            // ESP_LOGI(TAG, "Pin Direction: %d is %d", configs.pin_direction, BACKWARD);
-        } else {
-            digitalWrite(configs.pin_direction, LOW);
-            ESP_LOGI(TAG, "Direction: should be 0 currently %d", digitalRead(configs.pin_direction));
-            // ESP_LOGI(TAG, "Pin Direction: %d is %d", configs.pin_direction, FORWARD);
-        }
         return 1;
     } else {
-        ledcWrite(this->pwm_channel, abs(pwm));
-        ESP_LOGI(TAG, "PWM Val: %d", pwm);
-        if(configs.reversed){
-            digitalWrite(configs.pin_direction, LOW);
-            ESP_LOGI(TAG, "Direction: should be 0 currently %d", digitalRead(configs.pin_direction));
-            // ESP_LOGI(TAG, "Pin Direction: %d is %d", configs.pin_direction, FORWARD);
-        } else {
-            digitalWrite(configs.pin_direction, HIGH);
-            ESP_LOGI(TAG, "Direction: should be 1 currently %d", digitalRead(configs.pin_direction));
-            // ESP_LOGI(TAG, "Pin Direction: %d is %d", configs.pin_direction, BACKWARD);
-        }
+        digitalWrite(configs.pin_h_mos, 0);
+        digitalWrite(configs.pin_l_mos, 1);
+        ledcWrite(this->pwm_channel, -pwm);
         return 1;
     }
 }
 
+void Motor::brake(int pwm = 255){
+    digitalWrite(configs.pin_h_mos, 0);
+    digitalWrite(configs.pin_l_mos, 0);
+    ledcWrite(this->pwm_channel, abs(pwm));
+}
+
 int Motor::getpindir(){
-    return configs.pin_direction;
+    return configs.pin_enc_a;
 }
 
 int Motor::getpinpwm(){
@@ -90,7 +79,7 @@ uint8_t Motor::getpinpwm_channel(){
 }
 
 int64_t Motor::get_encoder_clear(){
-    if(configs.pin_encoder == 0){
+    if(configs.pin_enc_b == 0){
         ESP_LOGE(TAG, "Encoder haven't configured yet");
         return 0;
     }
@@ -99,7 +88,7 @@ int64_t Motor::get_encoder_clear(){
 }
 
 int64_t Motor::get_encoder(){
-    if(configs.pin_encoder == 0){
+    if(configs.pin_enc_b == 0){
         ESP_LOGE(TAG, "Encoder haven't configured yet");
         return 0;
     }
