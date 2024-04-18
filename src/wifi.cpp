@@ -17,8 +17,10 @@ void TaskWifi(void *pvParameters){
 
 void wifi_init(){
   if(!wifiInitiated){
-    WiFi.mode(WIFI_STA);
+    WiFi.mode(WIFI_AP_STA);
     auto result = WiFi.begin(ssid, pass);
+    auto resultAP = WiFi.softAP("ESP32", "admin");
+    Serial.println(WiFi.softAPIP());
     wifiInitiated = true;
     timer_wifi_init = millis();
   }
@@ -53,6 +55,9 @@ void WiFiEvent(WiFiEvent_t event){
             break;
         case ARDUINO_EVENT_WIFI_STA_STOP:
             break;
+        case ARDUINO_EVENT_WIFI_AP_STAIPASSIGNED:
+            log_i("%s",WiFi.softAPBroadcastIP().toString());
+            log_i("%s",WiFi.softAPIP().toString());
         default:
             break;
     }
