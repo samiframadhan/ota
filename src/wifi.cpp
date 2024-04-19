@@ -17,10 +17,10 @@ void TaskWifi(void *pvParameters){
 
 void wifi_init(){
   if(!wifiInitiated){
-    WiFi.mode(WIFI_AP_STA);
+    WiFi.mode(WIFI_STA);
     auto result = WiFi.begin(ssid, pass);
-    auto resultAP = WiFi.softAP("ESP32", "admin");
-    Serial.println(WiFi.softAPIP());
+    // auto resultAP = WiFi.softAP("ESP32", "admin");
+    // Serial.println(WiFi.softAPIP());
     wifiInitiated = true;
     timer_wifi_init = millis();
   }
